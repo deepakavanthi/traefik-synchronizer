@@ -13,7 +13,7 @@
 
 ## Download
 
-Pre-built images are published to the GitHub Container Registry on every push to `main`:
+Pre-built images are published to the GitHub Container Registry:
 
 ```bash
 docker pull ghcr.io/deepakavanthi/traefik-synchronizer:latest
