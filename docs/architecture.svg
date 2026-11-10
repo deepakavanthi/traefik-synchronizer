@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>Traefik Synchronizer architecture: one primary Traefik reads routes from etcd, which multiple per-host Traefik instances publish to</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f1b2d"/>
+      <stop offset="1" stop-color="#162a44"/>
+    </linearGradient>
+    <linearGradient id="traefik" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2bb3d6"/>
+      <stop offset="1" stop-color="#1b8aa8"/>
+    </linearGradient>
+    <linearGradient id="etcd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5aaee6"/>
+      <stop offset="1" stop-color="#3a86c4"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9fb3c8"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="600" rx="18" fill="url(#bg)"/>
+
+  <!-- Internet -->
+  <text x="480" y="34" text-anchor="middle" font-size="14" fill="#9fb3c8" letter-spacing="2">INTERNET</text>
+  <line x1="480" y1="44" x2="480" y2="74" stroke="#9fb3c8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Primary Traefik -->
+  <g filter="url(#shadow)">
+    <rect x="320" y="80" width="320" height="96" rx="14" fill="url(#traefik)"/>
+  </g>
+  <text x="480" y="120" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">Primary Traefik</text>
+  <text x="480" y="148" text-anchor="middle" font-size="14" fill="#e6f7fc">etcd provider · public ingress</text>
+
+  <!-- etcd -> primary -->
+  <line x1="480" y1="246" x2="480" y2="184" stroke="#9fb3c8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="494" y="220" font-size="13" fill="#9fb3c8">watch</text>
+
+  <!-- etcd cylinder -->
+  <g filter="url(#shadow)">
+    <path d="M400,262 v76 a80,16 0 0 0 160,0 v-76" fill="url(#etcd)"/>
+    <ellipse cx="480" cy="262" rx="80" ry="16" fill="#7cc2ef"/>
+  </g>
+  <text x="480" y="312" text-anchor="middle" font-size="24" font-weight="700" fill="#ffffff">etcd</text>
+  <text x="480" y="334" text-anchor="middle" font-size="13" fill="#e8f3fb">shared routes</text>
+
+  <!-- hosts -> etcd -->
+  <path d="M190,440 C190,390 330,350 398,322" fill="none" stroke="#9fb3c8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="480" y1="440" x2="480" y2="362" stroke="#9fb3c8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M770,440 C770,390 630,350 562,322" fill="none" stroke="#9fb3c8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="494" y="404" font-size="13" fill="#9fb3c8">publish routes</text>
+
+  <!-- Host A -->
+  <g filter="url(#shadow)">
+    <rect x="90" y="446" width="200" height="110" rx="12" fill="#1d3352" stroke="#2f4f75"/>
+    <rect x="106" y="462" width="168" height="44" rx="9" fill="url(#traefik)"/>
+  </g>
+  <text x="190" y="490" text-anchor="middle" font-size="16" font-weight="600" fill="#ffffff">Traefik</text>
+  <text x="190" y="526" text-anchor="middle" font-size="13" fill="#c9d6e3">+ synchronizer</text>
+  <text x="190" y="545" text-anchor="middle" font-size="12" fill="#8199b3">Docker host A</text>
+
+  <!-- Host B -->
+  <g filter="url(#shadow)">
+    <rect x="380" y="446" width="200" height="110" rx="12" fill="#1d3352" stroke="#2f4f75"/>
+    <rect x="396" y="462" width="168" height="44" rx="9" fill="url(#traefik)"/>
+  </g>
+  <text x="480" y="490" text-anchor="middle" font-size="16" font-weight="600" fill="#ffffff">Traefik</text>
+  <text x="480" y="526" text-anchor="middle" font-size="13" fill="#c9d6e3">+ synchronizer</text>
+  <text x="480" y="545" text-anchor="middle" font-size="12" fill="#8199b3">Docker host B</text>
+
+  <!-- Host C -->
+  <g filter="url(#shadow)">
+    <rect x="670" y="446" width="200" height="110" rx="12" fill="#1d3352" stroke="#2f4f75"/>
+    <rect x="686" y="462" width="168" height="44" rx="9" fill="url(#traefik)"/>
+  </g>
+  <text x="770" y="490" text-anchor="middle" font-size="16" font-weight="600" fill="#ffffff">Traefik</text>
+  <text x="770" y="526" text-anchor="middle" font-size="13" fill="#c9d6e3">+ synchronizer</text>
+  <text x="770" y="545" text-anchor="middle" font-size="12" fill="#8199b3">Docker host C</text>
+
+  <text x="480" y="586" text-anchor="middle" font-size="12" fill="#6f87a1">Each host keeps its own Traefik and Docker labels; the synchronizer mirrors its routes into etcd.</text>
+</svg>

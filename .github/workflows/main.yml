@@ -1,0 +1,44 @@
+name: traefik-synchronizer
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_FILE: dockerfile
+  CONTAINER_NAME: deepakavanthi/traefik-synchronizer
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_REGISTRY_USERNAME: ${{ github.actor }}
+  CONTAINER_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  
+  create-container:
+    name: Build Docker Container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Convert repository name to lowercase
+        id: repository_name
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: ${{ github.repository }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build container image
+        run: |
+          docker build . --file ${DOCKER_FILE} \
+          --label org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }} \
+          --tag ${CONTAINER_REGISTRY}/${CONTAINER_NAME}:latest \
+          --tag ${CONTAINER_REGISTRY}/${CONTAINER_NAME}:${{ github.run_number }}
+
+      - name: Login to the container registry
+        run: echo "${CONTAINER_REGISTRY_TOKEN}" | docker login ${CONTAINER_REGISTRY} -u ${CONTAINER_REGISTRY_USERNAME} --password-stdin
+
+      - name: Push container image to container registry
+        run: docker push --all-tags ${CONTAINER_REGISTRY}/${CONTAINER_NAME}
